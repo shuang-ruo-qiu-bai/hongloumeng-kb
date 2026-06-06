@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}红楼梦研究 · 搜索{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1 class="hero-title">红楼梦研究</h1>
+    <p class="hero-subtitle">本地 RAG 知识库 · 关键词 + 语义搜索</p>
+</div>
+
+<div class="search-section">
+    <form id="search-form" class="search-form" autocomplete="off">
+        <div class="search-row">
+            <input type="text"
+                   id="search-input"
+                   class="search-input"
+                   placeholder="输入搜索关键词，如「林黛玉」「索隐派」「脂评本」「宝玉挨打」……"
+                   autofocus>
+            <button type="submit" class="search-btn">搜索</button>
+        </div>
+        <div class="search-options">
+            <label class="mode-label">
+                <input type="radio" name="mode" value="hybrid" checked>
+                <span>混合搜索 (推荐)</span>
+            </label>
+            <label class="mode-label">
+                <input type="radio" name="mode" value="semantic_only">
+                <span>语义搜索</span>
+            </label>
+            <label class="mode-label">
+                <input type="radio" name="mode" value="keyword_only">
+                <span>关键词搜索</span>
+            </label>
+            <label class="mode-label mode-count">
+                <span>显示</span>
+                <select id="top-k-select">
+                    <option value="8">8</option>
+                    <option value="12" selected>12</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                </select>
+                <span>条</span>
+            </label>
+            <button type="button" class="ai-btn" id="ai-btn" title="AI 问答模式（需设置 API）">🤖 AI 问答</button>
+        </div>
+    </form>
+</div>
+
+<div id="results-area" class="results-area">
+    <div class="results-placeholder" id="placeholder">
+        <p>在上方输入搜索词开始查询</p>
+        <p class="placeholder-hint">支持关键词、语义、AI 三种搜索模式，结果来自 {{ sources|length }} 个红学资料</p>
+    </div>
+</div>
+
+<div id="loading" class="loading" style="display:none">
+    <div class="spinner"></div>
+    <span id="loading-text">搜索中……</span>
+</div>
+
+<div id="source-sidebar" class="source-sidebar">
+    <h3 class="sidebar-title">资料库</h3>
+    <ul class="source-list">
+    {% for s in sources %}
+        <li>
+            <a href="/source/{{ s.path }}" class="source-link" title="{{ s.info }}">
+                <span class="source-name">{{ s.name }}</span>
+                {% if s.info %}
+                <span class="source-info">{{ s.info[:50] }}{% if s.info|length > 50 %}…{% endif %}</span>
+                {% endif %}
+                <span class="source-size">{{ s.human_size }}</span>
+            </a>
+        </li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/script.js"></script>
+{% endblock %}

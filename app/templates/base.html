@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}红楼梦研究{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-brand">梦寻 · 红楼梦研究</a>
+            <div class="nav-links">
+                <a href="/" {% if request.path == '/' %}class="active"{% endif %}>搜索</a>
+                <a href="/status" {% if request.path == '/status' %}class="active"{% endif %}>索引状态</a>
+                <a href="/settings" {% if request.path == '/settings' %}class="active"{% endif %}>AI 设置</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <span>基于本地 RAG 知识库 · 共 {{ sources|length if sources else '?' }} 个来源</span>
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

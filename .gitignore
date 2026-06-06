@@ -1,0 +1,13 @@
+# Chroma 向量索引（部署后单独上传）
+chroma/
+
+# 运行时数据
+app/__pycache__/
+app/data/config.json
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store

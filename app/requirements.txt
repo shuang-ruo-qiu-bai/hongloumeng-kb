@@ -1,0 +1,8 @@
+flask>=3.0
+chromadb>=1.5
+sentence-transformers>=2.2
+torch>=2.0
+rank_bm25>=0.2
+numpy>=1.24
+tqdm>=4.60
+gunicorn>=21.2

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}索引状态 · 红楼梦研究{% endblock %}
+
+{% block content %}
+<div class="status-page">
+    <h1>索引状态</h1>
+    <div id="status-content" class="status-cards">
+        <p>加载中……</p>
+    </div>
+
+    <h2 style="margin-top:2rem">搜索模式说明</h2>
+    <div class="mode-cards">
+        <div class="mode-card">
+            <h3>混合搜索</h3>
+            <p>向量语义搜索 + BM25 关键词搜索 加权融合。兼顾概念理解和精确匹配，推荐默认使用。</p>
+        </div>
+        <div class="mode-card">
+            <h3>语义搜索</h3>
+            <p>使用 sentence-transformers 进行向量嵌入，在 ChromaDB 中进行余弦相似度搜索。适合概念性查询。</p>
+        </div>
+        <div class="mode-card">
+            <h3>关键词搜索</h3>
+            <p>逐行扫描匹配所有搜索词。适合精确引用、人物首现、特定回目等确定性查询。</p>
+        </div>
+    </div>
+
+    <h2 style="margin-top:2rem">资料库来源</h2>
+    <ul id="source-list-status" class="source-list-full">
+    </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+fetch('/api/status')
+    .then(r => r.json())
+    .then(data => {
+        const el = document.getElementById('status-content');
+        el.innerHTML = `
+            <div class="status-card">
+                <span class="stat-label">向量库</span>
+                <span class="stat-value">${data.chroma_exists ? '✓ 已建立' : '✗ 未建立'}</span>
+            </div>
+            <div class="status-card">
+                <span class="stat-label">索引文件数</span>
+                <span class="stat-value">${data.total_files || 0}</span>
+            </div>
+            <div class="status-card">
+                <span class="stat-label">文档片段数</span>
+                <span class="stat-value">${data.total_chunks || 0}</span>
+            </div>
+            <div class="status-card">
+                <span class="stat-label">向量库大小</span>
+                <span class="stat-value">${data.chroma_size || '—'}</span>
+            </div>
+            <div class="status-card">
+                <span class="stat-label">嵌入模型</span>
+                <span class="stat-value" style="font-size:0.85rem">${data.embed_model || '—'}</span>
+            </div>
+        `;
+    })
+    .catch(e => {
+        document.getElementById('status-content').innerHTML = `<p>加载失败: ${e.message}</p>`;
+    });
+
+fetch('/api/sources')
+    .then(r => r.json())
+    .then(sources => {
+        const el = document.getElementById('source-list-status');
+        el.innerHTML = sources.map(s => `
+            <li>
+                <a href="/source/${s.path}">${s.name}</a>
+                ${s.info ? `<span class="source-desc">${s.info}</span>` : ''}
+                <span class="source-size">${s.human_size}</span>
+            </li>
+        `).join('');
+    });
+</script>
+{% endblock %}

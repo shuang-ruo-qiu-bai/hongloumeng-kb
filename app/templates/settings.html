@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}设置 · 红楼梦研究{% endblock %}
+
+{% block head %}
+<style>
+/* 临时样式，后续合入 style.css */
+.setup-flow { max-width: 700px; margin: 0 auto; padding-top: 1.5rem; }
+.setup-flow h1 { font-size: 1.4rem; color: var(--crimson); margin-bottom: 0.5rem; }
+.setup-flow .subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem; }
+.setup-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+.setup-card h3 { font-size: 1rem; color: var(--text); margin-bottom: 0.5rem; }
+.setup-card p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.75rem; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem; }
+.form-group input, .form-group select { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.9rem; font-family: var(--font); background: white; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: var(--crimson); }
+.form-hint { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem; }
+.btn-save { background: var(--crimson); color: white; border: none; border-radius: var(--radius-sm); padding: 0.6rem 2rem; font-size: 0.95rem; cursor: pointer; font-family: var(--font); transition: background 0.2s; }
+.btn-save:hover { background: var(--crimson-light); }
+.msg { padding: 0.6rem 1rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin: 0.5rem 0; display: none; }
+.msg-success { background: #d4edda; color: #155724; display: block; }
+.msg-error { background: #f8d7da; color: #721c24; display: block; }
+.provider-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
+.provider-option { border: 2px solid var(--border-light); border-radius: var(--radius); padding: 1rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+.provider-option:hover { border-color: var(--gold); }
+.provider-option.selected { border-color: var(--crimson); background: rgba(139,0,0,0.04); }
+.provider-option h4 { font-size: 0.9rem; margin-bottom: 0.25rem; }
+.provider-option p { font-size: 0.78rem; color: var(--text-muted); margin: 0; }
+.toggle-row { display: flex; align-items: center; gap: 0.75rem; margin: 1rem 0; }
+.toggle-switch { position: relative; width: 48px; height: 26px; cursor: pointer; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; inset: 0; background: #ccc; border-radius: 26px; transition: 0.3s; }
+.toggle-slider::before { content: ""; position: absolute; height: 20px; width: 20px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+.toggle-switch input:checked + .toggle-slider { background: var(--crimson); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(22px); }
+.toggle-label { font-size: 0.9rem; color: var(--text); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="setup-flow">
+    <h1>AI 问答设置</h1>
+    <p class="subtitle">配置 AI 接口后，搜索时会自动用 AI 根据知识库内容生成回答</p>
+
+    <div class="setup-card">
+        <h3>选择 AI 提供商</h3>
+        <p>不同选项的优缺点：</p>
+        <div class="provider-grid" id="provider-grid">
+            <div class="provider-option selected" data-provider="deepseek">
+                <h4>DeepSeek</h4>
+                <p>性价比高 · 中文优秀<br>需 DeepSeek API Key</p>
+            </div>
+            <div class="provider-option" data-provider="claude">
+                <h4>Claude</h4>
+                <p>中文最佳<br>需 Anthropic API Key</p>
+            </div>
+            <div class="provider-option" data-provider="openai">
+                <h4>OpenAI</h4>
+                <p>兼容好<br>需 OpenAI API Key</p>
+            </div>
+            <div class="provider-option" data-provider="ollama">
+                <h4>Ollama</h4>
+                <p>完全免费 · 本地<br>需安装 Ollama</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="api-key">API Key</label>
+            <input type="password" id="api-key" placeholder="sk-...">
+            <div class="form-hint">DeepSeek 去 platform.deepseek.com 获取；Ollama 不需要 Key</div>
+        </div>
+
+        <div class="form-group">
+            <label for="api-base">API 地址（可选，留空用默认）</label>
+            <input type="text" id="api-base" placeholder="如 https://api.anthropic.com">
+            <div class="form-hint">Claude 默认为 api.anthropic.com，OpenAI 默认为 api.openai.com/v1</div>
+        </div>
+
+        <div class="form-group">
+            <label for="model">模型名称（可选，留空用默认）</label>
+            <input type="text" id="model" placeholder="如 claude-sonnet-4-20250514">
+            <div class="form-hint">DeepSeek 默认 deepseek-v4-flash，Claude 默认 claude-sonnet-4，OpenAI 默认 gpt-4o-mini</div>
+        </div>
+
+        <div class="toggle-row">
+            <label class="toggle-switch">
+                <input type="checkbox" id="ai-enabled">
+                <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">启用 AI 问答</span>
+        </div>
+
+        <div id="save-msg" class="msg"></div>
+        <button class="btn-save" id="btn-save">保存设置</button>
+    </div>
+
+    <div class="setup-card">
+        <h3>获取 API Key</h3>
+        <p>选择你需要的提供商并获取 Key：</p>
+        <p><strong>DeepSeek（推荐）</strong>：在 <a href="https://platform.deepseek.com" target="_blank">platform.deepseek.com</a> 注册 → API Keys → 创建 Key，充值后可用。价格极低，约 1 元可问数百次。</p>
+        <p><strong>Claude</strong>：在 <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> 获取 API Key</p>
+        <p><strong>OpenAI</strong>：在 <a href="https://platform.openai.com" target="_blank">platform.openai.com</a> 获取 API Key</p>
+        <p><strong>Ollama（免费）</strong>：从 <a href="https://ollama.com" target="_blank">ollama.com</a> 下载安装，运行 <code>ollama pull qwen2.5:7b</code></p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 提供商选择交互
+document.querySelectorAll('.provider-option').forEach(el => {
+    el.addEventListener('click', () => {
+        document.querySelectorAll('.provider-option').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('api-key').disabled = el.dataset.provider === 'ollama';
+    });
+});
+
+// 加载当前配置
+fetch('/api/config')
+    .then(r => r.json())
+    .then(cfg => {
+        document.querySelector(`.provider-option[data-provider="${cfg.provider}"]`)?.classList.add('selected');
+        document.querySelectorAll('.provider-option').forEach(e => {
+            if (e.dataset.provider !== cfg.provider) e.classList.remove('selected');
+        });
+        document.getElementById('api-base').value = cfg.api_base || '';
+        document.getElementById('model').value = cfg.model || '';
+        document.getElementById('ai-enabled').checked = cfg.enabled;
+        document.getElementById('api-key').disabled = cfg.provider === 'ollama';
+        // 如果已保存过 key，显示占位
+        if (cfg.api_key && cfg.api_key !== '') {
+            document.getElementById('api-key').placeholder = '已保存（输入新值可修改）';
+        }
+    });
+
+// 保存配置
+document.getElementById('btn-save').addEventListener('click', () => {
+    const provider = document.querySelector('.provider-option.selected')?.dataset.provider || 'claude';
+    const body = {
+        provider: provider,
+        api_key: document.getElementById('api-key').value,
+        api_base: document.getElementById('api-base').value,
+        model: document.getElementById('model').value,
+        enabled: document.getElementById('ai-enabled').checked,
+    };
+    fetch('/api/config', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body),
+    })
+    .then(r => r.json())
+    .then(data => {
+        const msg = document.getElementById('save-msg');
+        msg.className = 'msg msg-success';
+        msg.textContent = '✅ 设置已保存';
+        setTimeout(() => { msg.className = 'msg'; }, 3000);
+    })
+    .catch(e => {
+        const msg = document.getElementById('save-msg');
+        msg.className = 'msg msg-error';
+        msg.textContent = '❌ 保存失败: ' + e.message;
+    });
+});
+</script>
+{% endblock %}
