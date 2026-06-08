@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}红学人物 · 红楼梦研究{% endblock %}
+
+{% block head %}
+<style>
+.scholar-card-wrap { margin-bottom: 1rem; }
+.scholar-card { cursor: pointer; }
+.scholar-card a { text-decoration: none; color: inherit; display: block; }
+.scholar-detail-panel {
+    display: none;
+    border: 1px solid var(--jin);
+    border-top: none;
+    padding: 1.5rem 2rem;
+    background: var(--xuanzhi-light);
+    animation: fadeIn 0.3s ease;
+}
+.scholar-detail-panel.open { display: block; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.scholar-detail-panel .scholar-detail-bio { font-size: 0.95rem; line-height: 2.1; }
+.scholar-detail-panel .scholar-detail-bio p { margin-bottom: 0.8rem; }
+.scholar-detail-panel h3 {
+    font-family: var(--font-heading); font-size: 1rem;
+    color: var(--zhusha-dark); letter-spacing: 0.1em;
+    padding-left: 0.8rem; border-left: 3px solid var(--zhusha);
+    margin: 1.2rem 0 0.6rem;
+}
+.scholar-detail-panel h3:first-of-type { margin-top: 0; }
+.scholar-detail-panel ul { list-style: none; padding: 0; }
+.scholar-detail-panel li {
+    padding: 0.3rem 0 0.3rem 1.2rem; font-size: 0.9rem;
+    line-height: 1.8; color: var(--mo-light); position: relative;
+}
+.scholar-detail-panel li::before {
+    content: "◎"; position: absolute; left: 0; top: 0.3rem;
+    font-size: 0.5rem; color: var(--jin);
+}
+.scholar-detail-work {
+    padding: 0.6rem 1rem; margin-bottom: 0.4rem;
+    border: 1px solid var(--border); background: #fff;
+}
+.scholar-detail-work-title { font-weight: 600; color: var(--mo); }
+.scholar-detail-work-desc { font-size: 0.82rem; color: var(--mo-muted); font-family: var(--font-cite); margin-top: 0.1rem; }
+.scholar-detail-positions {
+    font-family: var(--font-cite); font-size: 0.85rem;
+    color: var(--mo-muted); padding: 0.6rem 1rem;
+    background: #fff; border: 1px solid var(--border);
+}
+.related-scholars-inline {
+    display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;
+}
+.related-scholars-inline a {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.25rem 1rem; border: 1px solid var(--border);
+    text-decoration: none; color: var(--mo); font-size: 0.82rem;
+    transition: all 0.2s;
+}
+.related-scholars-inline a:hover { border-color: var(--zhusha); color: var(--zhusha); }
+.scholar-expand-hint {
+    font-size: 0.75rem; color: var(--mo-muted); font-family: var(--font-cite);
+    margin-top: 0.3rem; transition: color 0.2s;
+}
+.scholar-card:hover .scholar-expand-hint { color: var(--zhusha); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>红学人物</h1>
+    <p class="page-subtitle">百年红学 · 薪火相传</p>
+</div>
+
+<figure class="page-banner">
+    <img src="/static/sunwen/017第5回 賈寶玉神遊太虛境.jpg" alt="孙温绘《红楼梦》" loading="lazy">
+    <figcaption class="sunwen-caption">贾宝玉神游太虚境</figcaption>
+</figure>
+
+<div class="scholar-grid scholars-page" id="scholar-grid">
+    {% for slug in order %}
+    {% set s = scholars[slug] %}
+    <div class="scholar-card-wrap" data-slug="{{ slug }}">
+        <div class="scholar-card" onclick="toggleScholar('{{ slug }}')">
+            {% if s.get('has_photo') %}
+            <img src="/static/scholars/{{ slug }}.jpg" alt="{{ s.name }}" class="scholar-avatar-img">
+            {% else %}
+            <div class="scholar-avatar" style="background:{{ s.avatar_color }}">{{ s.name_short }}</div>
+            {% endif %}
+            <div class="scholar-name">{{ s.name }}</div>
+            <div class="scholar-dates">{{ s.dates }}</div>
+            <div class="scholar-bio">{{ s.bio_short }}</div>
+            <div class="scholar-work">{{ s.major_works[0][0] }}</div>
+            <div class="scholar-expand-hint" id="hint-{{ slug }}">点击展开详情 ▼</div>
+        </div>
+        <div class="scholar-detail-panel" id="detail-{{ slug }}">
+            <div class="scholar-detail-bio">
+                {% for paragraph in s.bio_long.split('\n\n') %}
+                <p>{{ paragraph }}</p>
+                {% endfor %}
+            </div>
+
+            <h3>代表著作</h3>
+            {% for title, desc in s.major_works %}
+            <div class="scholar-detail-work">
+                <div class="scholar-detail-work-title">{{ title }}</div>
+                <div class="scholar-detail-work-desc">{{ desc }}</div>
+            </div>
+            {% endfor %}
+
+            <h3>学术贡献</h3>
+            <ul>
+                {% for c in s.contributions %}
+                <li>{{ c }}</li>
+                {% endfor %}
+            </ul>
+
+            {% if s.key_positions %}
+            <h3>职务</h3>
+            <div class="scholar-detail-positions">{{ s.key_positions }}</div>
+            {% endif %}
+
+            {% if s.related_scholars %}
+            <h3>相关学者</h3>
+            <div class="related-scholars-inline">
+                {% for rel_slug in s.related_scholars %}
+                {% set rel = scholars.get(rel_slug) %}
+                {% if rel %}
+                <a href="#" onclick="scrollToScholar('{{ rel_slug }}'); return false;">
+                    <span class="related-scholar-avatar" style="background:{{ rel.avatar_color }};width:24px;height:24px;font-size:0.65rem">{{ rel.name_short }}</span>
+                    {{ rel.name }}
+                </a>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+let currentOpen = null;
+
+// Auto-open from hash on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const hash = window.location.hash.replace('#', '');
+    if (hash) setTimeout(function() { toggleScholar(hash); }, 300);
+});
+
+function toggleScholar(slug) {
+    const panel = document.getElementById('detail-' + slug);
+    const hint = document.getElementById('hint-' + slug);
+    if (!panel) return;
+
+    // Close previous
+    if (currentOpen && currentOpen !== slug) {
+        const prev = document.getElementById('detail-' + currentOpen);
+        const prevHint = document.getElementById('hint-' + currentOpen);
+        if (prev) { prev.classList.remove('open'); prev.style.display = 'none'; }
+        if (prevHint) prevHint.textContent = '点击展开详情 ▼';
+    }
+
+    // Toggle current
+    const isOpen = panel.classList.contains('open');
+    if (isOpen) {
+        panel.classList.remove('open');
+        panel.style.display = 'none';
+        if (hint) hint.textContent = '点击展开详情 ▼';
+        currentOpen = null;
+    } else {
+        panel.style.display = 'block';
+        panel.classList.add('open');
+        if (hint) hint.textContent = '点击收起详情 ▲';
+        currentOpen = slug;
+    }
+}
+
+function scrollToScholar(slug) {
+    if (currentOpen && currentOpen !== slug) {
+        const prev = document.getElementById('detail-' + currentOpen);
+        const prevHint = document.getElementById('hint-' + currentOpen);
+        if (prev) { prev.classList.remove('open'); prev.style.display = 'none'; }
+        if (prevHint) prevHint.textContent = '点击展开详情 ▼';
+    }
+    currentOpen = null;
+    const wrap = document.querySelector('[data-slug="' + slug + '"]');
+    if (wrap) {
+        wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Auto-open
+        setTimeout(() => toggleScholar(slug), 400);
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+
+{% block title %}红楼图咏 · 红楼梦研究{% endblock %}
+
+{% block head %}
+<style>
+.paintings-intro {
+    max-width: 820px;
+    margin: 0 auto 2.5rem;
+    background: var(--xuanzhi-light);
+    padding: 1.8rem 2rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--jin);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 2.2;
+    color: var(--mo);
+    position: relative;
+    overflow: hidden;
+}
+.paintings-intro p {
+    text-indent: 2em;
+    margin-bottom: 0.8em;
+}
+.paintings-intro p:last-child {
+    margin-bottom: 0;
+}
+.paintings-intro strong {
+    color: var(--zhusha-dark);
+    font-weight: 600;
+}
+
+.paintings-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    max-width: 820px;
+    margin: 0 auto 3rem;
+}
+.paintings-item {
+    border: 1px solid var(--border);
+    background: var(--xuanzhi-light);
+    padding: 0.5rem;
+    transition: all 0.3s;
+}
+.paintings-item:hover {
+    border-color: var(--jin);
+    box-shadow:
+        0 0 0 1px var(--jin-light),
+        0 0 0 3px #faf8f2,
+        0 0 0 4px var(--jin),
+        0 4px 16px rgba(139,0,0,0.08);
+}
+.paintings-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+.paintings-item figcaption {
+    font-family: var(--font-cite);
+    font-size: 0.82rem;
+    color: var(--mo-muted);
+    text-align: center;
+    padding: 0.5rem 0.3rem 0.3rem;
+    line-height: 1.6;
+}
+
+.paintings-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    max-width: 820px;
+    margin: 0 auto 2.5rem;
+    padding: 1.5rem;
+    background: var(--xuanzhi-light);
+    border: 1px solid var(--border);
+}
+.paintings-stat {
+    text-align: center;
+}
+.paintings-stat-num {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    color: var(--zhusha);
+    letter-spacing: 0.05em;
+}
+.paintings-stat-label {
+    font-family: var(--font-cite);
+    font-size: 0.82rem;
+    color: var(--mo-muted);
+    margin-top: 0.15rem;
+}
+
+@media (max-width: 600px) {
+    .paintings-gallery {
+        grid-template-columns: 1fr;
+    }
+    .paintings-stats {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+/* ---- 高清原图下载卡片 ---- */
+.painting-download-section {
+    max-width: 820px;
+    margin: 0 auto 3rem;
+}
+.painting-download-card {
+    display: flex;
+    gap: 1.5rem;
+    border: 1px solid var(--border);
+    background: var(--xuanzhi-light);
+    padding: 1.5rem;
+    transition: border-color 0.2s;
+}
+.painting-download-card:hover {
+    border-color: var(--jin);
+}
+.painting-download-preview {
+    flex-shrink: 0;
+    width: 160px;
+}
+.painting-download-preview img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--border);
+}
+.painting-download-info {
+    flex: 1;
+    min-width: 0;
+}
+.painting-download-title {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    color: var(--zhusha-dark);
+    margin: 0 0 0.5rem;
+    letter-spacing: 0.05em;
+}
+.painting-download-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.6rem;
+}
+.painting-download-tag {
+    font-family: var(--font-cite);
+    font-size: 0.75rem;
+    color: var(--mo-muted);
+    border: 1px solid var(--border);
+    padding: 0.1rem 0.5rem;
+    background: var(--xuanzhi);
+}
+.painting-download-desc {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--mo);
+    line-height: 1.8;
+    margin: 0 0 1rem;
+}
+.painting-download-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.painting-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--zhusha);
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1.2rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    border-radius: 2px;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+}
+.painting-download-btn:hover {
+    opacity: 0.85;
+    color: white;
+}
+.painting-download-btn-icon {
+    font-size: 1rem;
+}
+.painting-download-code {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: var(--font-cite);
+    font-size: 0.82rem;
+}
+.painting-download-code-label {
+    color: var(--mo-muted);
+}
+.painting-download-code-value {
+    color: var(--zhusha);
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    font-size: 0.9rem;
+}
+.painting-download-copy {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.75rem;
+    color: var(--mo-muted);
+    cursor: pointer;
+    font-family: var(--font-cite);
+}
+.painting-download-copy:hover {
+    border-color: var(--jin);
+    color: var(--mo);
+}
+
+@media (max-width: 600px) {
+    .painting-download-card {
+        flex-direction: column;
+    }
+    .painting-download-preview {
+        width: 100%;
+        max-width: 200px;
+    }
+    .painting-download-links {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>红楼图咏</h1>
+    <p class="page-subtitle">孙温 · 孙允谟 · 清 · 彩绘工笔红楼梦</p>
+</div>
+
+<figure class="page-banner">
+    <img src="/static/sunwen/114第53回 榮國府元宵開夜宴.jpg" alt="荣国府元宵开夜宴" loading="eager" fetchpriority="high" decoding="async">
+    <figcaption class="sunwen-caption">荣国府元宵开夜宴</figcaption>
+</figure>
+
+<div class="paintings-intro">
+    <p><strong>孙温</strong>（字润斋，号浭阳居士，约1818—？），河北丰润人，清代画家。孙温自清同治六年（1867年）前后开始酝酿绘制《红楼梦》画册，历时数十载。其侄<strong>孙允谟</strong>（字鹭波，号小洲，1857—约1936年）在创作中途加入，叔侄二人合作至少十八年，共同完成了这部鸿篇巨制。全本共<strong>230幅</strong>绢本工笔彩绘，单幅画心纵约43厘米、横约76厘米，是中国绘画史上以《红楼梦》为主题的最大规模系列作品。</p>
+    <p>孙温与孙允谟的画风各具特色：孙温<strong>笔法工细</strong>，色彩明丽，建筑园林刻画精微；孙允谟<strong>笔触略粗</strong>，色彩偏重赭黄，风格更为奔放。前八十回与后四十回在画风上的差异，正反映了两位画家不同的艺术个性。画作采用工笔重彩技法，融合中国传统青绿山水、界面与西方焦点透视法，并独创"时空并置"手法，在同一画面中表现不同时空的多个场景，共呈现三千七百余人物形象。</p>
+    <p>这套画册原由大连旅顺博物馆收藏（国家一级文物）。1959年由上海文物保管委员会发现后拨交旅顺博物馆，2004年在中国国家博物馆首次公开展出，引起世界性轰动。现已出版《清·孙温绘全本红楼梦》《梦影红楼》《拾花入梦》等多种版本，曾获"香港印制大奖""美国印制大奖"等奖项。画作因其极高的艺术与文献价值，被誉为<strong>"红学研究的视觉宝库"</strong>。</p>
+</div>
+
+<div class="paintings-stats">
+    <div class="paintings-stat">
+        <div class="paintings-stat-num">230</div>
+        <div class="paintings-stat-label">幅彩绘</div>
+    </div>
+    <div class="paintings-stat">
+        <div class="paintings-stat-num">50余载</div>
+        <div class="paintings-stat-label">创作时间</div>
+    </div>
+    <div class="paintings-stat">
+        <div class="paintings-stat-num">3700余</div>
+        <div class="paintings-stat-label">人物形象</div>
+    </div>
+    <div class="paintings-stat">
+        <div class="paintings-stat-num">43×76cm</div>
+        <div class="paintings-stat-label">每幅尺寸</div>
+    </div>
+</div>
+
+<h2 class="section-title">画作赏析</h2>
+<p class="section-subtitle">选录数幅，以窥全豹</p>
+
+<div class="paintings-gallery">
+    <figure class="paintings-item">
+        <img src="/static/sunwen/060第17-18回 賈政奉旨貴妃省親.jpg" alt="贾政奉旨贵妃省亲" loading="lazy" decoding="async">
+        <figcaption>贾政奉旨贵妃省亲</figcaption>
+    </figure>
+    <figure class="paintings-item">
+        <img src="/static/sunwen/126第62回 酒散暇遊觀魚下棋.jpg" alt="酒散暇游观鱼下棋" loading="lazy" decoding="async">
+        <figcaption>酒散暇游观鱼下棋</figcaption>
+    </figure>
+    <figure class="paintings-item">
+        <img src="/static/sunwen/131第66-67回 情小妹耻情歸地府 冷二郎心冷入空門.jpg" alt="情小妹耻情归地府 冷二郎心冷入空门" loading="lazy" decoding="async">
+        <figcaption>情小妹耻情归地府 冷二郎心冷入空门</figcaption>
+    </figure>
+    <figure class="paintings-item">
+        <img src="/static/sunwen/133第68回 酸鳳姐大鬧寧國府.jpg" alt="酸凤姐大闹宁国府" loading="lazy" decoding="async">
+        <figcaption>酸凤姐大闹宁国府</figcaption>
+    </figure>
+    <figure class="paintings-item">
+        <img src="/static/sunwen/143第74-75回 惑奸讒抄檢大觀園.jpg" alt="惑奸谗抄检大观园" loading="lazy" decoding="async">
+        <figcaption>惑奸谗抄检大观园</figcaption>
+    </figure>
+    <figure class="paintings-item">
+        <img src="/static/sunwen/159第82-83回 林黛玉臥病瀟湘館.jpg" alt="林黛玉卧病潇湘馆" loading="lazy" decoding="async">
+        <figcaption>林黛玉卧病潇湘馆</figcaption>
+    </figure>
+</div>
+
+<div class="page-section-divider"></div>
+
+<div class="paintings-intro">
+    <p>孙温绘本的价值不仅在于其艺术成就，更在于它以<strong>图像的形式忠实再现了《红楼梦》的情节、人物和生活场景</strong>。对于研究清代建筑、服饰、礼仪、饮食等社会生活的学者而言，这套画作是难得的第一手视觉史料。对于普通读者而言，孙温的画作则是进入红楼梦世界的绝佳向导——那些在文字中需要想象的形象、场景和氛围，在孙温的笔下皆化为可见的、可感的、鲜活的艺术画面。</p>
+</div>
+
+<div class="painting-download-section">
+    <h2 class="section-title" style="margin-top:0">高清原图下载</h2>
+    <div class="painting-download-card">
+        <div class="painting-download-preview">
+            <img src="/static/sunwen/114第53回 榮國府元宵開夜宴.jpg" alt="孙温绘本">
+        </div>
+        <div class="painting-download-info">
+            <h3 class="painting-download-title">孙温绘全本红楼梦 · 高清原图</h3>
+            <div class="painting-download-tags">
+                <span class="painting-download-tag">76GB</span>
+                <span class="painting-download-tag">203张</span>
+                <span class="painting-download-tag">第二版</span>
+                <span class="painting-download-tag">JPEG</span>
+            </div>
+            <div class="painting-download-links">
+                <a href="https://pan.baidu.com/s/1a-GIp97HKZ3LVVHiTSKw9g?pwd=5agm" target="_blank" rel="noopener" class="painting-download-btn">
+                    <span class="painting-download-btn-icon">&#x2B07;</span>
+                    <span>前往百度网盘下载</span>
+                </a>
+                <div class="painting-download-code">
+                    <span class="painting-download-code-label">提取码</span>
+                    <span class="painting-download-code-value">5agm</span>
+                    <button class="painting-download-copy" onclick="var btn=this;navigator.clipboard.writeText('5agm').then(function(){btn.textContent='已复制'}).catch(function(){})">复制</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

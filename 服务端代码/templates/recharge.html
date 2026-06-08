@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}充值 · 红楼梦研究{% endblock %}
+
+{% block head %}
+<style>
+.recharge-page { max-width: 640px; margin: 0 auto; padding: 2rem 1rem; }
+.recharge-card {
+    border: 1px solid var(--border);
+    background: var(--xuanzhi-light);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+}
+.recharge-card h2 {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    color: var(--mo);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.2rem;
+    border-bottom: 2px solid var(--jin);
+}
+
+/* ---- 定价方案 ---- */
+.recharge-plans {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.recharge-plan {
+    flex: 1;
+    border: 1px solid var(--border);
+    padding: 1.2rem 0.8rem;
+    text-align: center;
+    background: var(--xuanzhi);
+    transition: border-color 0.2s;
+}
+.recharge-plan:hover {
+    border-color: var(--jin);
+}
+.recharge-plan-name {
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    color: var(--mo);
+    margin-bottom: 0.4rem;
+}
+.recharge-plan-price {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--zhusha);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+.recharge-plan-unit {
+    font-family: var(--font-cite);
+    font-size: 0.82rem;
+    color: var(--mo-muted);
+    margin-top: 0.2rem;
+}
+.recharge-plan-tag {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-family: var(--font-cite);
+    font-size: 0.72rem;
+    color: var(--zhusha-dark);
+    background: rgba(201, 169, 110, 0.15);
+    padding: 0.15rem 0.6rem;
+    border-radius: 2px;
+}
+
+/* ---- 二维码 ---- */
+.recharge-qrs {
+    display: flex;
+    gap: 2.5rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+.recharge-qr-item {
+    text-align: center;
+}
+.recharge-qr-item img {
+    width: 200px;
+    height: 200px;
+    border: 1px solid var(--border);
+    display: block;
+}
+.recharge-qr-label {
+    margin-top: 0.5rem;
+    font-family: var(--font-cite);
+    font-size: 0.82rem;
+    color: var(--mo-muted);
+}
+
+/* ---- 说明 ---- */
+.recharge-instructions {
+    font-size: 0.88rem;
+    line-height: 2;
+    color: var(--mo-light);
+}
+.recharge-instructions ol {
+    padding-left: 1.2rem;
+    margin: 0;
+}
+.recharge-instructions li {
+    margin-bottom: 0.3rem;
+}
+.recharge-note {
+    background: rgba(201, 169, 110, 0.12);
+    padding: 0.5rem 0.8rem;
+    font-size: 0.85rem;
+    color: var(--zhusha-dark);
+    font-family: var(--font-cite);
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 560px) {
+    .recharge-plans {
+        flex-direction: column;
+    }
+    .recharge-qrs {
+        flex-direction: column;
+        align-items: center;
+    }
+    .recharge-qr-item img {
+        width: 180px;
+        height: 180px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="recharge-page">
+    <div class="page-header">
+        <h1>AI 问答</h1>
+        <p class="page-subtitle">包月 · 包年 · 买断</p>
+    </div>
+
+    {% if current_user.is_authenticated %}
+    <div class="recharge-card">
+        <h2>当前状态</h2>
+        <p style="font-size:1.1rem;color:var(--zhusha);margin:0;">
+            {% if current_user.is_lifetime or current_user.is_admin %}
+                ∞ 无限次（终身会员）
+            {% else %}
+                剩余 {{ current_user.balance }} 次
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+
+    <div class="recharge-card">
+        <h2>选择方案</h2>
+
+        <div class="recharge-plans">
+            <div class="recharge-plan">
+                <div class="recharge-plan-name">包月</div>
+                <div class="recharge-plan-price">¥19</div>
+                <div class="recharge-plan-unit">/ 月 · 无限次</div>
+                <div class="recharge-plan-tag">灵活 · 随时停</div>
+            </div>
+            <div class="recharge-plan">
+                <div class="recharge-plan-name">包年</div>
+                <div class="recharge-plan-price">¥99</div>
+                <div class="recharge-plan-unit">/ 年 · 无限次</div>
+                <div class="recharge-plan-tag">省 ¥129</div>
+            </div>
+            <div class="recharge-plan">
+                <div class="recharge-plan-name">买断</div>
+                <div class="recharge-plan-price">¥199</div>
+                <div class="recharge-plan-unit">永久 · 无限次</div>
+                <div class="recharge-plan-tag">一次付费 · 长期使用</div>
+            </div>
+        </div>
+
+        <div class="recharge-note">
+            <b>备注你的用户名</b> — 扫码付款时，在备注中写明你的网站用户名，方便对账
+        </div>
+
+        <div class="recharge-qrs">
+            <div class="recharge-qr-item">
+                <img src="/static/qrcode-wechat-pay.jpg" alt="微信支付">
+                <div class="recharge-qr-label">微信支付</div>
+            </div>
+            <div class="recharge-qr-item">
+                <img src="/static/qrcode-alipay.jpg" alt="支付宝">
+                <div class="recharge-qr-label">支付宝</div>
+            </div>
+        </div>
+
+        <div class="recharge-instructions">
+            <ol>
+                <li>选择方案，扫码付款</li>
+                <li><b>备注写明你的用户名</b></li>
+                <li>到账后开通（一般 24 小时内）</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="recharge-card">
+        <h2>加微信</h2>
+        <p style="font-size:0.88rem;color:var(--mo-light);margin:0 0 1rem;">
+            如有问题或想交流红学，欢迎加我微信
+        </p>
+        <div style="text-align:center;">
+            <img src="/static/qrcode-wechat.jpg" alt="加我微信" style="width:180px;height:180px;border:1px solid var(--border);display:inline-block;">
+            <p style="font-family:var(--font-cite);font-size:0.82rem;color:var(--mo-muted);margin-top:0.5rem;">扫码加微信</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

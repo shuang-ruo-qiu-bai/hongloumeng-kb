@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}红楼梦研究{% endblock %}</title>
+    <link rel="icon" href="/static/红楼梦寻印章.png" type="image/png">
+    <link rel="stylesheet" href="/static/style.css?v=14">
+    {% block head %}{% endblock %}
+</head>
+<body class="page-{{ active_page }}">
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-brand"><span id="nav-toggle-btn" class="nav-toggle-icon" onclick="toggleMobileNav();return false">☰</span> 红楼梦研究</a>
+            <div class="nav-links">
+                <a href="/canon" class="{% if active_page == 'canon' %}active{% endif %}">红楼原著</a>
+                <a href="/poems" class="{% if active_page == 'poems' %}active{% endif %}">红楼诗词</a>
+                <a href="/editions" class="{% if active_page == 'editions' %}active{% endif %}">红楼版本</a>
+                <a href="/customs" class="{% if active_page == 'customs' %}active{% endif %}">红楼风俗</a>
+                <a href="/paintings" class="{% if active_page == 'paintings' %}active{% endif %}">红楼图咏</a>
+                <a href="/history" class="{% if active_page == 'history' %}active{% endif %}">红学历史</a>
+                <a href="/scholars" class="{% if active_page == 'scholars' %}active{% endif %}">红学人物</a>
+                <a href="/library" class="{% if active_page == 'library' %}active{% endif %}">红学文库</a>
+            </div>
+            <div class="nav-auth">
+                {% if current_user.is_authenticated %}
+                <a href="/recharge" class="nav-auth-link nav-balance" title="充值续费 · 查看剩余次数">
+                    {% if current_user.is_lifetime or current_user.is_admin %}∞{% else %}{{ current_user.balance }}{% endif %}次 · 充值
+                </a>
+                <span class="nav-auth-sep">|</span>
+                <span class="nav-auth-user">{{ current_user.username }}</span>
+                {% if current_user.is_admin %}
+                <span class="nav-auth-sep">|</span>
+                <a href="/admin" class="nav-auth-link">管理</a>
+                <span class="nav-auth-sep">|</span>
+                <a href="/settings" class="nav-auth-link">设置</a>
+                <span class="nav-auth-sep">|</span>
+                <a href="/status" class="nav-auth-link">状态</a>
+                {% endif %}
+                <span class="nav-auth-sep">|</span>
+                <a href="/logout" class="nav-auth-link">退出</a>
+                {% else %}
+                <a href="/login" class="nav-auth-link">登录</a>
+                <span class="nav-auth-sep">|</span>
+                <a href="/register" class="nav-auth-link">注册</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="nav-mobile-menu" id="nav-mobile-menu">
+        <a href="/canon" class="{% if active_page == 'canon' %}active{% endif %}" onclick="closeMobileNav()">红楼原著</a>
+        <a href="/poems" class="{% if active_page == 'poems' %}active{% endif %}" onclick="closeMobileNav()">红楼诗词</a>
+        <a href="/editions" class="{% if active_page == 'editions' %}active{% endif %}" onclick="closeMobileNav()">红楼版本</a>
+        <a href="/customs" class="{% if active_page == 'customs' %}active{% endif %}" onclick="closeMobileNav()">红楼风俗</a>
+        <a href="/paintings" class="{% if active_page == 'paintings' %}active{% endif %}" onclick="closeMobileNav()">红楼图咏</a>
+        <a href="/history" class="{% if active_page == 'history' %}active{% endif %}" onclick="closeMobileNav()">红学历史</a>
+        <a href="/scholars" class="{% if active_page == 'scholars' %}active{% endif %}" onclick="closeMobileNav()">红学人物</a>
+        <a href="/library" class="{% if active_page == 'library' %}active{% endif %}" onclick="closeMobileNav()">红学文库</a>
+    </div>
+
+    <main class="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <span class="footer-text">霜若秋白辑录 · 丙午年</span>
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+
+    <!-- 背景音乐 -->
+    <audio id="bgm" src="/static/wangningmei.mp3" preload="none" loop></audio>
+    <div id="music-btn" class="music-player-btn" title="枉凝眉 · 红楼梦插曲" onclick="toggleMusic()">♪</div>
+    <div id="sidebar-floating-btn" class="sidebar-floating-btn" onclick="if(typeof toggleSidebar==='function')toggleSidebar()" title="对话历史">☰</div>
+    <script>
+    var _musicPlaying = false;
+    function toggleMusic() {
+        var a = document.getElementById('bgm');
+        var b = document.getElementById('music-btn');
+        if (_musicPlaying) {
+            a.pause();
+            _musicPlaying = false;
+            b.classList.remove('playing');
+            b.textContent = '♪';
+        } else {
+            a.play().then(function() {
+                _musicPlaying = true;
+                b.classList.add('playing');
+                b.textContent = '♫';
+            }).catch(function(e) {
+                console.log('播放失败:', e);
+            });
+        }
+    }
+    function toggleMobileNav() {
+        var m = document.getElementById('nav-mobile-menu');
+        if (m.style.display === 'block') {
+            m.style.display = 'none';
+        } else {
+            m.style.display = 'block';
+        }
+    }
+    function closeMobileNav() {
+        document.getElementById('nav-mobile-menu').style.display = 'none';
+    }
+    </script>
+    <style>
+    .music-player-btn {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--xuanzhi-light);
+        border: 1px solid var(--jin);
+        color: var(--zhusha);
+        font-size: 1.2rem;
+        line-height: 44px;
+        text-align: center;
+        cursor: pointer;
+        z-index: 999;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+        user-select: none;
+    }
+    .music-player-btn:hover {
+        background: var(--jin);
+        color: white;
+        box-shadow: 0 2px 12px rgba(201,169,110,0.3);
+    }
+    .music-player-btn.playing {
+        background: var(--zhusha);
+        color: white;
+        border-color: var(--zhusha);
+        animation: music-pulse 2s ease-in-out infinite;
+    }
+    @keyframes music-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(139,0,0,0.2); }
+        50% { box-shadow: 0 0 0 8px rgba(139,0,0,0); }
+    }
+    </style>
+</body>
+</html>

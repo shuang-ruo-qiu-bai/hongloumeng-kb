@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}红楼诗词 · 红楼梦研究{% endblock %}
+
+{% block head %}
+<style>
+/* ── Poetry page styles ── */
+.poetry-layout { display: flex; gap: 2rem; align-items: flex-start; }
+
+/* Sidebar */
+.poetry-sidebar {
+    flex: 0 0 180px;
+    position: sticky; top: 5rem;
+    border-right: 1px solid var(--border);
+    padding-right: 1rem;
+}
+.poetry-sidebar-title {
+    font-family: var(--font-heading);
+    font-size: 1rem; color: var(--mo);
+    letter-spacing: 0.15em;
+    padding-bottom: 0.6rem;
+    margin-bottom: 0.6rem;
+    border-bottom: 2px solid var(--jin);
+}
+.poetry-nav { list-style: none; padding: 0; margin: 0; }
+.poetry-nav li { margin-bottom: 0.2rem; }
+.poetry-nav a {
+    display: block; padding: 0.4rem 0.5rem;
+    font-size: 0.85rem; color: var(--mo-light);
+    text-decoration: none; border-radius: 4px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+.poetry-nav a:hover { color: var(--zhusha); background: var(--xuanzhi-light); }
+.poetry-nav a.active { color: var(--zhusha-dark); background: var(--xuanzhi); font-weight: 600; }
+
+/* Main content area */
+.poetry-main { flex: 1; min-width: 0; }
+
+.poetry-category-title {
+    font-family: var(--font-heading);
+    font-size: 1.4rem; color: var(--mo);
+    letter-spacing: 0.1em;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--jin);
+    display: none;
+}
+.poetry-category-title.visible { display: block; }
+
+/* Poem grid */
+.poem-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+}
+
+.poem-card {
+    border: 1px solid var(--border);
+    background: var(--xuanzhi-light);
+    padding: 1.2rem 1.4rem;
+    transition: border-color 0.2s;
+}
+.poem-card:hover { border-color: var(--zhusha); }
+
+.poem-card-header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 0.6rem;
+}
+.poem-card-title {
+    font-family: var(--font-heading);
+    font-size: 0.95rem; color: var(--mo);
+    font-weight: 600;
+}
+.poem-card-meta {
+    font-size: 0.75rem; color: var(--mo-muted);
+    font-family: var(--font-cite);
+}
+
+.poem-card-author {
+    font-size: 0.8rem; color: var(--zhusha);
+    font-family: var(--font-cite);
+    margin-bottom: 0.8rem;
+}
+
+.poem-card-text {
+    font-size: 0.9rem; line-height: 2.1;
+    color: var(--mo);
+    text-align: left;
+}
+.poem-card-text .poem-line {
+    display: block;
+    padding-left: 0;
+}
+.poem-card-text .poem-break {
+    display: block;
+    height: 0.4em;
+}
+/* Long prose lines within poems */
+.poem-card-text .poem-line[data-long] {
+    text-indent: 2em;
+    margin-bottom: 0.3em;
+}
+
+/* Empty state */
+.poetry-empty {
+    text-align: center; padding: 3rem;
+    color: var(--mo-muted); font-family: var(--font-cite);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .poetry-layout { flex-direction: column; }
+    .poetry-sidebar {
+        flex: none; width: 100%;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 0 0 0.8rem 0;
+        margin-bottom: 1rem;
+    }
+    .poetry-nav { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+    .poetry-nav li { margin: 0; }
+    .poetry-nav a { padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+    .poem-grid { grid-template-columns: 1fr; }
+}
+/* Speaker names in 联句 */
+.poem-card-text .poem-speaker {
+    font-size: 0.75em;
+    color: var(--zhusha);
+    font-family: var(--font-cite);
+    margin-right: 0.4em;
+    white-space: nowrap;
+}
+/* Prose lines in poems (e.g. 芙蓉女儿诔 preface) */
+.poem-card-text .prose-line {
+    text-indent: 2em;
+    margin-bottom: 0.3em;
+    line-height: 2.1;
+}
+/* Override for the prose-line to display as block with proper spacing */
+.poem-card-text .prose-line {
+    display: block;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>红楼诗词</h1>
+    <p class="page-subtitle">据蔡义江《红楼梦诗词曲赋全解》整理</p>
+</div>
+
+<figure class="page-banner">
+    <img src="/static/sunwen/093第38-39回 林瀟湘魁奪菊花詩 薛蘅蕪諷和螃蟹咏.jpg" alt="孙温绘《红楼梦》" loading="lazy">
+    <figcaption class="sunwen-caption">林潇湘魁夺菊花诗 薛蘅芜讽和螃蟹咏</figcaption>
+</figure>
+
+<div class="poetry-layout">
+    <aside class="poetry-sidebar">
+        <div class="poetry-sidebar-title">分类</div>
+        <ul class="poetry-nav" id="poetry-nav">
+            {% for cat in categories %}
+            <li><a href="#" data-cat="{{ cat.slug }}" class="{% if loop.first %}active{% endif %}">{{ cat.name }}</a></li>
+            {% endfor %}
+        </ul>
+    </aside>
+
+    <div class="poetry-main">
+        {% for cat in categories %}
+        <div class="poetry-category" data-cat="{{ cat.slug }}" {% if not loop.first %}style="display:none"{% endif %}>
+            <h2 class="poetry-category-title visible">{{ cat.name }}</h2>
+            <div class="poem-grid">
+                {% for poem in cat.poems %}
+                <div class="poem-card">
+                    <div class="poem-card-header">
+                        <span class="poem-card-title">{{ poem.title }}</span>
+                        <span class="poem-card-meta">{{ poem.chapter }}</span>
+                    </div>
+                    {% if poem.author %}
+                    <div class="poem-card-author">{{ poem.author }}</div>
+                    {% endif %}
+                    <div class="poem-card-text">{% for line in poem.lines %}
+                        {%- set line_idx = loop.index0 -%}
+                        {%- if poem.line_types is defined and poem.line_types[line_idx] is defined and poem.line_types[line_idx] == "prose" -%}
+                            <p class="prose-line">{{ line }}</p>
+                        {%- elif poem.speaker_notes is defined and poem.speaker_notes[line_idx] is defined and poem.speaker_notes[line_idx] -%}
+                            {%- if line -%}
+                                <span class="poem-line"><span class="poem-speaker">{{ poem.speaker_notes[line_idx] }}</span>{{ line }}</span>
+                            {%- else -%}
+                                <span class="poem-break"></span>
+                            {%- endif -%}
+                        {%- else -%}
+                            {%- if line -%}
+                                <span class="poem-line">{{ line }}</span>
+                            {%- else -%}
+                                <span class="poem-break"></span>
+                            {%- endif -%}
+                        {%- endif -%}
+                    {%- endfor %}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const navLinks = document.querySelectorAll('.poetry-nav a');
+    const categories = document.querySelectorAll('.poetry-category');
+
+    navLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const cat = this.getAttribute('data-cat');
+
+            // Update nav active
+            navLinks.forEach(function(l) { l.classList.remove('active'); });
+            this.classList.add('active');
+
+            // Show selected category
+            categories.forEach(function(c) {
+                if (c.getAttribute('data-cat') === cat) {
+                    c.style.display = 'block';
+                } else {
+                    c.style.display = 'none';
+                }
+            });
+
+            // Scroll to top of content
+            document.querySelector('.poetry-main').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+});
+</script>
+{% endblock %}

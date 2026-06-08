@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}管理后台 · 红楼梦研究{% endblock %}
+
+{% block head %}
+<style>
+.admin-page { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
+.admin-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.admin-table th, .admin-table td {
+    border: 1px solid var(--border);
+    padding: 0.5rem 0.8rem;
+    text-align: left;
+    font-size: 0.85rem;
+}
+.admin-table th { background: var(--xuanzhi-light); font-family: var(--font-heading); }
+.admin-table tr:hover { background: var(--xuanzhi-light); }
+.admin-section {
+    border: 1px solid var(--border);
+    background: var(--xuanzhi-light);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.admin-section h2 {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    color: var(--mo);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--jin);
+}
+.admin-form { display: flex; gap: 0.5rem; align-items: end; flex-wrap: wrap; }
+.admin-form .form-group { margin-bottom: 0; }
+.admin-form label { display: block; font-size: 0.8rem; color: var(--mo-muted); margin-bottom: 0.2rem; }
+.admin-form .form-input { padding: 0.4rem 0.6rem; width: 120px; }
+.btn-admin {
+    background: var(--zhusha); color: var(--jin-light);
+    border: none; padding: 0.4rem 1rem;
+    cursor: pointer; border-radius: 4px;
+    font-family: var(--font-body);
+}
+.btn-admin:hover { background: var(--zhusha-light); }
+.btn-admin-sm {
+    background: var(--zhusha); color: #fff; border: none;
+    padding: 0.2rem 0.5rem; font-size: 0.75rem;
+    cursor: pointer; border-radius: 3px; margin: 0 2px;
+}
+.admin-msg { padding: 0.5rem 1rem; margin: 0.5rem 0; border-radius: 4px; font-size: 0.9rem; display: none; }
+.admin-msg.success { background: #e8f5e9; color: #2e7d32; display: block; }
+.admin-msg.error { background: #fbe9e7; color: #c62828; display: block; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="page-header">
+        <h1>管理后台</h1>
+        <p class="page-subtitle">用户管理 · 充值操作</p>
+    </div>
+
+    <div id="admin-msg" class="admin-msg"></div>
+
+    <div class="admin-section">
+        <h2>手动充值</h2>
+        <form class="admin-form" id="topup-form">
+            <div class="form-group">
+                <label>用户 ID</label>
+                <input type="number" class="form-input" id="topup-user-id" placeholder="用户 ID" min="1" required>
+            </div>
+            <div class="form-group">
+                <label>增加次数</label>
+                <input type="number" class="form-input" id="topup-amount" placeholder="次数" min="1" value="100" required>
+            </div>
+            <button type="submit" class="btn-admin">充值</button>
+        </form>
+    </div>
+
+    <div class="admin-section">
+        <h2>设为终身会员</h2>
+        <form class="admin-form" id="lifetime-form">
+            <div class="form-group">
+                <label>用户 ID</label>
+                <input type="number" class="form-input" id="lifetime-user-id" placeholder="用户 ID" min="1" required>
+            </div>
+            <button type="submit" class="btn-admin">设为终身会员</button>
+        </form>
+    </div>
+
+    <div class="admin-section">
+        <h2>用户列表</h2>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>用户名</th>
+                    <th>余额</th>
+                    <th>终身</th>
+                    <th>管理员</th>
+                    <th>注册时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="user-table-body">
+                <tr><td colspan="7" style="text-align:center;color:var(--mo-muted);">加载中……</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showMsg(text, type) {
+    const el = document.getElementById('admin-msg');
+    el.textContent = text;
+    el.className = 'admin-msg ' + type;
+    setTimeout(() => { el.className = 'admin-msg'; }, 5000);
+}
+
+// 充值
+document.getElementById('topup-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const uid = document.getElementById('topup-user-id').value;
+    const amount = document.getElementById('topup-amount').value;
+    fetch('/api/admin/topup', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({user_id: parseInt(uid), amount: parseInt(amount)}),
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.error) { showMsg(d.error, 'error'); return; }
+        showMsg(d.status || '充值成功', 'success');
+        loadUsers();
+    })
+    .catch(() => showMsg('请求失败', 'error'));
+});
+
+// 终身会员
+document.getElementById('lifetime-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const uid = document.getElementById('lifetime-user-id').value;
+    fetch('/api/admin/lifetime', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({user_id: parseInt(uid)}),
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.error) { showMsg(d.error, 'error'); return; }
+        showMsg(d.status || '设置成功', 'success');
+        loadUsers();
+    })
+    .catch(() => showMsg('请求失败', 'error'));
+});
+
+// 加载用户列表
+function loadUsers() {
+    fetch('/api/admin/users')
+    .then(r => r.json())
+    .then(d => {
+        if (d.error) { showMsg(d.error, 'error'); return; }
+        const tbody = document.getElementById('user-table-body');
+        tbody.innerHTML = d.users.map(u => `
+            <tr>
+                <td>${u.id}</td>
+                <td>${u.username}</td>
+                <td>${u.balance}</td>
+                <td>${u.is_lifetime ? '✅' : '-'}</td>
+                <td>${u.is_admin ? '✅' : '-'}</td>
+                <td>${u.created_at || '-'}</td>
+                <td>
+                    <button class="btn-admin-sm" onclick="topupQuick(${u.id})">+100</button>
+                    <button class="btn-admin-sm" onclick="lifetimeQuick(${u.id})">终身</button>
+                </td>
+            </tr>
+        `).join('');
+    });
+}
+
+function topupQuick(uid) {
+    fetch('/api/admin/topup', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({user_id: uid, amount: 100}),
+    })
+    .then(r => r.json())
+    .then(d => {
+        showMsg(d.status || '+100 成功', 'success');
+        loadUsers();
+    });
+}
+
+function lifetimeQuick(uid) {
+    fetch('/api/admin/lifetime', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({user_id: uid}),
+    })
+    .then(r => r.json())
+    .then(d => {
+        showMsg(d.status || '已设为终身', 'success');
+        loadUsers();
+    });
+}
+
+loadUsers();
+</script>
+{% endblock %}

@@ -1,0 +1,469 @@
+{% extends "base.html" %}
+
+{% block title %}红楼梦 · 原著阅读 · 红楼梦研究{% endblock %}
+
+{% block head %}
+<style>
+/* ── Chapter list (回目 grid) ── */
+.canon-header {
+    text-align: center;
+    padding: 2.5rem 0 1rem;
+    position: relative;
+}
+.canon-header::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 2px;
+    background: var(--jin);
+    margin: 1rem auto 0;
+}
+.canon-header h1 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--mo);
+    letter-spacing: 0.3em;
+    font-weight: 400;
+}
+.canon-header .subtitle {
+    font-family: var(--font-cite);
+    color: var(--mo-muted);
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
+    letter-spacing: 0.1em;
+}
+
+.canon-chapter-grid {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 0.6rem;
+    padding: 1.5rem 0 3rem;
+}
+
+.canon-chapter-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.65rem 0.8rem;
+    background: var(--xuanzhi-light);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: var(--mo);
+}
+.canon-chapter-item:hover {
+    border-color: var(--zhusha);
+    background: #f0e8d8;
+}
+.canon-chapter-num {
+    font-family: var(--font-cite);
+    font-size: 0.8rem;
+    color: var(--zhusha);
+    font-weight: 600;
+    white-space: nowrap;
+    min-width: 3em;
+}
+.canon-chapter-title {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--mo-light);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+}
+
+/* ── Reading view ── */
+.canon-reading {
+    display: none;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 1rem 0 3rem;
+}
+.canon-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+}
+.canon-nav-inner {
+    display: flex;
+    gap: 1.2rem;
+}
+.canon-nav a {
+    color: var(--zhusha);
+    text-decoration: none;
+    font-family: var(--font-cite);
+    font-size: 0.88rem;
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+    border-radius: 3px;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.canon-nav a:hover {
+    background: var(--xuanzhi-light);
+}
+.canon-nav .back-link {
+    color: var(--mo-muted);
+    font-size: 0.82rem;
+}
+.canon-nav-divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--jin-light), transparent);
+    margin: 0.5rem 0 1.5rem;
+}
+.canon-chapter-title-display {
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    color: var(--mo);
+    letter-spacing: 0.1em;
+    padding: 2rem 0 1.5rem;
+    line-height: 1.8;
+    position: relative;
+}
+.canon-chapter-title-display::before,
+.canon-chapter-title-display::after {
+    content: '◆';
+    font-size: 0.4rem;
+    color: var(--jin);
+    display: block;
+    margin: 0.5rem auto;
+}
+.canon-chapter-title-display .title-num {
+    display: block;
+    font-family: var(--font-cite);
+    font-size: 0.85rem;
+    color: var(--mo-muted);
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.15em;
+}
+.canon-chapter-title-display .title-body {
+    display: block;
+    font-size: 1.1rem;
+}
+
+/* ── Text body ── */
+.canon-text {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 2.2;
+    color: var(--mo);
+    text-align: justify;
+    padding: 1rem 1.5rem 2rem;
+    background: var(--xuanzhi-light);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+}
+.canon-text p {
+    text-indent: 2em;
+    margin-bottom: 0.4em;
+}
+.canon-loading {
+    text-align: center;
+    padding: 4rem 0;
+    color: var(--mo-muted);
+    font-family: var(--font-cite);
+}
+
+/* ── Notes section ── */
+.canon-notes {
+    margin-top: 2rem;
+    padding: 0 1.5rem;
+}
+.canon-notes-section {
+    margin-bottom: 1.5rem;
+}
+.canon-notes-title {
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    color: var(--mo);
+    letter-spacing: 0.15em;
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.6rem;
+    border-bottom: 1px solid var(--jin-light);
+    font-weight: 400;
+}
+.canon-note-item {
+    font-family: var(--font-cite);
+    font-size: 0.82rem;
+    line-height: 1.8;
+    color: var(--mo-light);
+    margin-bottom: 0.3rem;
+    padding-left: 0.5rem;
+}
+.canon-note-num {
+    color: var(--zhusha);
+    font-weight: 600;
+    margin-right: 0.3rem;
+}
+/* ── Inline note markers (superscript) ── */
+.canon-note-ref {
+    font-size: 0.65em;
+    vertical-align: super;
+    line-height: 0;
+    color: var(--zhusha);
+    font-family: var(--font-cite);
+    cursor: default;
+}
+
+/* ── Sun Wen illustration for each chapter ── */
+.canon-sunwen-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin: 2.5rem auto 2.5rem;
+    max-width: 700px;
+}
+.canon-sunwen-gallery:empty {
+    display: none;
+}
+.canon-sunwen-item {
+    text-align: center;
+}
+.canon-sunwen-item img {
+    background: var(--xuanzhi-light);
+}
+/* Styling handled by .page-banner in style.css */
+
+@media (max-width: 768px) {
+    .canon-sunwen-gallery { flex-direction: column; align-items: center; }
+}
+
+@media (max-width: 768px) {
+    .canon-chapter-grid {
+        grid-template-columns: 1fr;
+        padding: 0.5rem 0 2rem;
+    }
+    .canon-reading {
+        padding: 0.3rem;
+    }
+    .canon-text {
+        font-size: 0.92rem;
+        padding: 0.8rem 0.8rem 1.5rem;
+        line-height: 2.0;
+    }
+    .canon-chapter-title-display {
+        font-size: 1rem;
+    }
+}
+
+/* ── Illustration for section decoration ── */
+.canon-section-img {
+    text-align: center;
+    margin: 2rem 0;
+    opacity: 0.9;
+}
+.canon-section-img img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="canon-header">
+    <h1>红楼梦</h1>
+    <p class="subtitle">曹雪芹 著 · 无名氏 续 · 程伟元 高鹗 整理</p>
+</div>
+
+<figure class="page-banner">
+    <img src="/static/sunwen/001 第1回 石頭記大觀園全景.jpg" alt="孙温绘《红楼梦》" loading="lazy">
+    <figcaption class="sunwen-caption">石头记大观园全景</figcaption>
+</figure>
+
+<!-- Chapter list (回目 grid) -->
+<div class="canon-chapter-grid" id="chapter-list">
+    {% for ch in chapters %}
+    {% if ch.num != 18 or ch.title != chapters[ch.num-2].title %}
+    <a class="canon-chapter-item" href="#" onclick="return readChapter({{ ch.num }})">
+        {% set parts = ch.title.split(' ') %}
+        <span class="canon-chapter-num">{{ parts[0] }}</span>
+        <span class="canon-chapter-title">{{ parts[1:]|join(' ') }}</span>
+    </a>
+    {% endif %}
+    {% endfor %}
+</div>
+
+<!-- Reading view -->
+<div class="canon-reading" id="reading-view">
+    <div class="canon-nav">
+        <a href="#" onclick="return showChapterList()" class="back-link">← 回目</a>
+        <div class="canon-nav-inner">
+            <a href="#" onclick="return prevChapter()">← 上一回</a>
+            <a href="#" onclick="return nextChapter()">下一回 →</a>
+        </div>
+    </div>
+    <hr class="canon-nav-divider">
+
+    <div class="canon-chapter-title-display" id="chapter-title"></div>
+    <div class="canon-sunwen-gallery" id="chapter-images"></div>
+    <div class="canon-text" id="chapter-content">
+        <div class="canon-loading">加载中……</div>
+    </div>
+    <div class="canon-notes" id="chapter-notes"></div>
+
+    <hr class="canon-nav-divider">
+    <div class="canon-nav">
+        <a href="#" onclick="return showChapterList()" class="back-link">← 回目</a>
+        <div class="canon-nav-inner">
+            <a href="#" onclick="return prevChapter()">← 上一回</a>
+            <a href="#" onclick="return nextChapter()">下一回 →</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+var currentChapter = null;
+var sunwenMap = null;
+
+function showChapterImages(num) {
+    var container = document.getElementById('chapter-images');
+    if (!sunwenMap || !sunwenMap[num] || !sunwenMap[num][0]) {
+        container.innerHTML = '';
+        return;
+    }
+    // Pick first image that doesn't match the page banner (001)
+    var imgs = sunwenMap[num];
+    var img = imgs[0];
+    for (var i = 0; i < imgs.length; i++) {
+        if (!imgs[i].startsWith('001')) {
+            img = imgs[i];
+            break;
+        }
+    }
+    // Remove leading number and "第X回" prefix (e.g. "017第5回 賈寶玉神遊太虛境" -> "賈寶玉神遊太虛境")
+    var caption = img.replace(/\.jpg$/, '').replace(/^\d+\s*第[\d-]+回\s*/, '');
+    var encoded = encodeURIComponent(img);
+    container.innerHTML = '<div class="canon-sunwen-item"><figure class="page-banner" style="max-width:500px;margin:0">' +
+        '<img src="/static/sunwen/' + encoded + '" alt="' + caption + '">' +
+        '<figcaption class="sunwen-caption">' + caption + '</figcaption></figure></div>';
+}
+
+function showChapterList() {
+    document.getElementById('chapter-list').style.display = '';
+    document.getElementById('reading-view').style.display = 'none';
+    window.scrollTo({top: 0});
+    return false;
+}
+
+function readChapter(num) {
+    currentChapter = num;
+    document.getElementById('chapter-list').style.display = 'none';
+    document.getElementById('reading-view').style.display = 'block';
+    document.getElementById('chapter-content').innerHTML = '<div class="canon-loading">加载中……</div>';
+    document.getElementById('chapter-title').textContent = '';
+    document.getElementById('chapter-notes').innerHTML = '';
+    document.getElementById('chapter-images').innerHTML = '';
+
+    fetch('/api/canon/chapter/' + num)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.error) {
+                document.getElementById('chapter-content').innerHTML = '<p style="color:var(--zhusha)">' + data.error + '</p>';
+                document.getElementById('chapter-notes').innerHTML = '';
+                return;
+            }
+
+            // Title (use annotated version if available)
+            var rawTitle = data.annotated_title || data.title;
+            var titleParts = rawTitle.split(' ');
+            var titleNum = titleParts[0] || '';
+            var titleBody = titleParts.slice(1).join(' ') || rawTitle;
+            // Convert inline note markers to superscript in title
+            titleBody = titleBody.replace(/\[(\d+)\]/g, '<sup class="canon-note-ref">[$1]</sup>');
+            titleBody = titleBody.replace(/[〔\[]([一二三四五六七八九十百零〇]+)[〕\]]/g, '<sup class="canon-note-ref">〔$1〕</sup>');
+            document.getElementById('chapter-title').innerHTML =
+                '<span class="title-num">' + titleNum + '</span>' +
+                '<span class="title-body">' + titleBody + '</span>';
+
+            // Parse content into paragraphs with superscript note markers
+            var text = data.content;
+            // Convert inline note markers to superscript
+            text = text.replace(/\[(\d+)\]/g, '<sup class="canon-note-ref">[$1]</sup>');
+            text = text.replace(/[〔\[]([一二三四五六七八九十百零〇]+)[〕\]]/g, '<sup class="canon-note-ref">〔$1〕</sup>');
+            var paragraphs = text.split(/\n\s*\n/);
+            var html = '';
+            for (var i = 0; i < paragraphs.length; i++) {
+                var p = paragraphs[i].trim();
+                if (p) {
+                    p = p.replace(/\n/g, '<br>');
+                    html += '<p>' + p + '</p>';
+                }
+            }
+            document.getElementById('chapter-content').innerHTML = html;
+
+            // Render notes
+            var notesHtml = '';
+            if (data.arabic_notes && data.arabic_notes.length > 0) {
+                notesHtml += '<div class="canon-notes-section"><div class="canon-notes-title">校　注</div>';
+                for (var j = 0; j < data.arabic_notes.length; j++) {
+                    var n = data.arabic_notes[j];
+                    notesHtml += '<div class="canon-note-item"><span class="canon-note-num">[' + n.num + ']</span>' + n.text + '</div>';
+                }
+                notesHtml += '</div>';
+            }
+            if (data.chinese_notes && data.chinese_notes.length > 0) {
+                notesHtml += '<div class="canon-notes-section"><div class="canon-notes-title">校　记</div>';
+                for (var j = 0; j < data.chinese_notes.length; j++) {
+                    var n = data.chinese_notes[j];
+                    notesHtml += '<div class="canon-note-item"><span class="canon-note-num">〔' + n.num + '〕</span>' + n.text + '</div>';
+                }
+                notesHtml += '</div>';
+            }
+            document.getElementById('chapter-notes').innerHTML = notesHtml;
+            showChapterImages(num);
+            window.scrollTo({top: document.querySelector('.canon-reading').offsetTop - 60});
+        })
+        .catch(function() {
+            document.getElementById('chapter-content').innerHTML = '<p style="color:var(--zhusha)">加载失败，请重试</p>';
+        });
+    return false;
+}
+
+function prevChapter() {
+    if (currentChapter > 1) {
+        readChapter(currentChapter - 1);
+    }
+    return false;
+}
+
+function nextChapter() {
+    var nums = [];
+    {% for ch in chapters %}
+    {% if ch.num != 18 or ch.title != chapters[ch.num-2].title %}
+    nums.push({{ ch.num }});
+    {% endif %}
+    {% endfor %}
+    var idx = nums.indexOf(currentChapter);
+    if (idx >= 0 && idx < nums.length - 1) {
+        readChapter(nums[idx + 1]);
+    }
+    return false;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/static/sunwen_chapter_map.json')
+        .then(function(r) { return r.json(); })
+        .then(function(m) { sunwenMap = m; })
+        .catch(function() {});
+    var hash = window.location.hash;
+    if (hash && hash.startsWith('#read-')) {
+        var num = parseInt(hash.replace('#read-', ''));
+        if (num) readChapter(num);
+    }
+});
+</script>
+{% endblock %}

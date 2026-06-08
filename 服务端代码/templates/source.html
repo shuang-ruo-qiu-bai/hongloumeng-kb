@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}{{ source_name }} · 红楼梦研究{% endblock %}
+
+{% block content %}
+<div class="source-header">
+    <a href="/" class="back-link">&larr; 返回搜索</a>
+    <h1 class="source-title">{{ source_name }}</h1>
+    {% if source_info %}
+    <p class="source-meta">{{ source_info }}</p>
+    {% endif %}
+</div>
+
+<div class="source-content">
+    <pre class="source-text">{{ content }}</pre>
+</div>
+{% endblock %}

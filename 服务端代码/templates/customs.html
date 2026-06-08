@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}红楼风俗 · 红楼梦研究{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>红楼风俗</h1>
+    <p class="page-subtitle">据邓云乡《红楼风俗名物谭》整理</p>
+</div>
+
+<figure class="page-banner">
+    <img src="/static/sunwen/095第40回 史太君兩宴大觀園 劉姥姥初遊大觀園.jpg" alt="孙温绘《红楼梦》" loading="lazy">
+    <figcaption class="sunwen-caption">史太君两宴大观园 刘姥姥初游大观园</figcaption>
+</figure>
+
+<!-- Book intro -->
+<div class="customs-book-intro">
+    <div class="customs-book-meta">
+        <span class="customs-book-title">{{ customs_book.title }}</span>
+        <span class="customs-book-author">{{ customs_book.author }}（{{ customs_book.author_dates }}）</span>
+    </div>
+    <div class="customs-book-summary">
+        <p>{{ customs_book.summary }}</p>
+    </div>
+    <div class="customs-author-bio">
+        <p><strong>作者简介：</strong>{{ customs_book.author_bio }}</p>
+    </div>
+</div>
+
+<!-- Categories -->
+<div class="customs-categories">
+    {% for cat in customs_book.categories %}
+    <div class="customs-category">
+        <div class="customs-category-header">
+            <h2 class="customs-category-name">{{ cat.name }}</h2>
+            <p class="customs-category-desc">{{ cat.description }}</p>
+        </div>
+        <ul class="customs-chapter-list">
+            {% for ch in cat.chapters %}
+            <li class="customs-chapter-item" data-chapter="{{ ch }}">
+                <span class="customs-chapter-toggle">+</span>
+                <span class="customs-chapter-title">{{ ch }}</span>
+                <div class="customs-chapter-body" style="display:none;"></div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.customs-chapter-item').forEach(function (item) {
+        item.addEventListener('click', function () {
+            const body = this.querySelector('.customs-chapter-body');
+            const toggle = this.querySelector('.customs-chapter-toggle');
+
+            if (body.style.display === 'block') {
+                body.style.display = 'none';
+                toggle.textContent = '+';
+                return;
+            }
+
+            // Already loaded
+            if (body.dataset.loaded) {
+                body.style.display = 'block';
+                toggle.textContent = '−';
+                return;
+            }
+
+            // Fetch content
+            const title = this.dataset.chapter;
+            body.innerHTML = '<em style="color:var(--mo-muted);font-size:0.85rem;">加载中……</em>';
+            body.style.display = 'block';
+            toggle.textContent = '−';
+
+            fetch('/api/customs/chapter?title=' + encodeURIComponent(title))
+                .then(r => r.json())
+                .then(data => {
+                    if (data.error) {
+                        body.innerHTML = '<em style="color:var(--zhusha);font-size:0.85rem;">' + data.error + '</em>';
+                        return;
+                    }
+                    body.innerHTML = '<div class="customs-chapter-text">' + data.content.replace(/\n/g, '<br>') + '</div>';
+                    body.dataset.loaded = '1';
+                })
+                .catch(function () {
+                    body.innerHTML = '<em style="color:var(--zhusha);font-size:0.85rem;">加载失败</em>';
+                });
+        });
+    });
+});
+</script>
+{% endblock %}

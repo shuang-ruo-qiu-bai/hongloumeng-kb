@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}红楼梦寻{% endblock %}
+
+{% block head %}
+<link rel="preload" href="/static/script.js" as="script">
+<style>
+.main-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: calc(100vh - 52px);
+}
+.main-footer { margin-top: auto; }
+.footer { display: none; }
+html { overflow-x: hidden; }
+.main { padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 0; max-width: calc(1200px + 318px + 1.5rem); box-sizing: border-box; }
+.search-form { margin: 0 auto; }
+@media (max-width: 768px) {
+    .main { padding-left: 0; }
+}
+.site-credit {
+  text-align: center;
+  padding: 0.4rem 1.5rem 0.6rem;
+  color: var(--mo-muted);
+  font-size: 0.7rem;
+  font-family: var(--font-cite);
+  opacity: 0.6;
+  letter-spacing: 0.08em;
+  border-top: 1px solid var(--border);
+  margin-top: 1rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<aside class="index-sidebar collapsed" id="index-sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-header-top">
+            <span class="sidebar-title">对话历史</span>
+            <button class="sidebar-new-btn" onclick="newChatSession()" title="新对话" id="sidebar-new-btn">+</button>
+            <button class="sidebar-manage-btn" onclick="toggleBatchMode()" title="批量管理">管理</button>
+            <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="收起边栏">◀</button>
+        </div>
+    </div>
+    <div class="sidebar-sessions" id="sidebar-sessions">
+    </div>
+    <div class="sidebar-batch-bar" id="sidebar-batch-bar" style="display:none">
+        <label class="sidebar-batch-select-all">
+            <input type="checkbox" id="batch-select-all" onchange="toggleSelectAll()"> 全选
+        </label>
+        <button class="sidebar-batch-delete-btn" id="batch-delete-btn" onclick="deleteSelected()" disabled>删除选中(<span id="batch-count-label">0</span>)</button>
+    </div>
+</aside>
+<div class="sidebar-handle" id="sidebar-handle"></div>
+<div class="main-content">
+    <div class="hero">
+    <div class="hero-bg"></div>
+        <div class="hero-seal">
+            <img src="/static/红楼梦寻印章.png" alt="红楼梦" class="hero-seal-img">
+        </div>
+        <h1 class="hero-title">红楼梦寻</h1>
+        <p class="hero-subtitle">红楼梦知识库</p>
+    </div>
+
+    <div class="search-section">
+        <form id="search-form" class="search-form" autocomplete="off">
+            <div class="search-row">
+                <input type="text"
+                       id="search-input"
+                       class="search-input"
+                       placeholder="输入搜索词，如「林黛玉」……"
+                       autofocus>
+                <button type="submit" class="search-btn">搜索</button>
+            </div>
+            <div class="search-options">
+                <label class="mode-label">
+                    <input type="radio" name="mode" value="hybrid" checked>
+                    <span>混合</span>
+                </label>
+                <label class="mode-label">
+                    <input type="radio" name="mode" value="semantic_only">
+                    <span>语义</span>
+                </label>
+                <label class="mode-label">
+                    <input type="radio" name="mode" value="keyword_only">
+                    <span>关键词</span>
+                </label>
+                <label class="mode-label mode-count">
+                    <select id="top-k-select">
+                        <option value="12" selected>12条</option>
+                        <option value="20">20条</option>
+                        <option value="30">30条</option>
+                    </select>
+                </label>
+                <button type="button" class="ai-btn" id="ai-btn">AI 问答</button>
+                <span id="ai-balance" class="ai-balance"></span>
+            </div>
+        </form>
+    </div>
+
+    <div id="results-area" class="results-area">
+        <div class="results-placeholder" id="placeholder">
+            <p>在上方输入搜索词开始查询</p>
+            <p class="placeholder-hint">关键词搜索 · 语义搜索 · AI 问答</p>
+        </div>
+    </div>
+
+    <div id="loading" class="loading" style="display:none">
+        <span id="loading-text">搜索中……</span>
+    </div>
+
+    <div class="main-footer">
+        <div id="quote-bar" class="quote-bar">
+            <span id="quote-text" class="quote-text"></span>
+        </div>
+
+        <div class="site-credit">霜若秋白辑录 · 丙午年</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/script.js?v={{ range(999999, 9999999) | random }}"></script>
+{% endblock %}

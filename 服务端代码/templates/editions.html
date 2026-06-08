@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}红楼版本 · 红楼梦研究{% endblock %}
+
+{% block head %}
+<link rel="preload" href="/static/script.js" as="script">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>红楼版本</h1>
+    <p class="page-subtitle">《红楼梦》版本源流 · 校注本下载</p>
+</div>
+
+<figure class="page-banner">
+    <img src="/static/sunwen/002第1回 青埂峰僧道談頑石 空空道說石頭起源.jpg" alt="孙温绘《红楼梦》" loading="lazy">
+    <figcaption class="sunwen-caption">青埂峰僧道谈顽石 空空道说石头起源</figcaption>
+</figure>
+
+<div class="edition-intro">
+    <p>《红楼梦》版本之繁多，堪称历代说部之最，据一粟《红楼梦书录》著录计达一百七十余种。红学家<strong>林冠夫</strong>（中国艺术研究院研究员、中国红学会副会长）于《红楼梦版本论》中提出：将版本简单分为"脂评本系统"与"程本系统"并不妥当——"程甲本又以梦觉本为底本整理而成，而梦觉本亦属脂评本，故程甲本也来源于脂评本。将脂本与程本对举，是类与属的不伦，无异于将母女放在一个辈分。"林冠夫主张按时间先后分为<strong>早期钞本</strong>与<strong>后期梓印本</strong>。</p>
+</div>
+
+<div class="edition-system">
+    <h3 class="edition-system-title">早期钞本（乾隆五十六年前手抄本）</h3>
+    <p class="edition-system-desc">据林冠夫研究，今存早期钞本凡十一种十四部。皆为过录本，过录所据的最初祖本各形成于乾隆辛亥之前。各钞本异同及渊源关系，各有迹可寻。</p>
+    <div class="edition-grid">
+        <div class="edition-card">
+            <div class="edition-name">甲戌本</div>
+            <div class="edition-desc">仅存十六回。原为大兴刘铨福旧藏，后归胡适，今藏美国康奈尔大学。以其第一回"至脂砚斋甲戌抄阅再评"语而得名。甲戌（1754）为现存最早纪年。</div>
+        </div>
+        <div class="edition-card">
+            <div class="edition-name">己卯本</div>
+            <div class="edition-desc">第三十一至四十回目录页上有"己卯冬月定本"字样。今藏北京图书馆，实存三十八回。中国历史博物馆另藏有五回残页，系己卯本散佚部分。</div>
+        </div>
+        <div class="edition-card">
+            <div class="edition-name">庚辰本</div>
+            <div class="edition-desc">存七十八回。其四个十回分册目录页上各有"庚辰秋月定本"字样。原藏清同治状元徐郙，今藏北京大学图书馆。保存脂评最多，弥足珍贵。</div>
+        </div>
+        <div class="edition-card">
+            <div class="edition-name">戚序本</div>
+            <div class="edition-desc">卷首有戚蓼生序，故名。凡四种：张开模原藏本（母本）、南京图书馆藏本（据张本照抄）、有正书局石印大字本及小字本。林冠夫将此四本归为同一分支。</div>
+        </div>
+        <div class="edition-card">
+            <div class="edition-name">俄藏本</div>
+            <div class="edition-desc">藏于俄罗斯彼得堡亚洲研究所，又称列藏本。存七十八回。林冠夫以为早期钞本之一重要分支，属于国外收藏的《红楼梦》钞本。</div>
+        </div>
+        <div class="edition-card">
+            <div class="edition-name">蒙古王府本</div>
+            <div class="edition-desc">第七十一回回末有另笔书写"柒爷王爷"四字，显系清某蒙古王府旧藏，今藏北京图书馆。林冠夫称"清某王府藏本"，将其列为早期钞本的一个特殊分支。</div>
+        </div>
+        <div class="edition-card">
+            <div class="edition-name">梦觉主人序本</div>
+            <div class="edition-desc">卷首有梦觉主人序，署乾隆甲辰年（1784）。文字较甲戌、己卯庚辰本有较多修改。林冠夫指出：程高本即在梦觉本基础上整理而成，此本为程甲本形成之"前奏和过渡"。</div>
+        </div>
+        <div class="edition-card">
+            <div class="edition-name">舒元炜序本</div>
+            <div class="edition-desc">舒元炜序作于乾隆五十四年（1789），序末钤有舒氏印章。林冠夫强调：各钞本中可以确定为乾隆年间原钞本者，仅此一部。原由吴晓铃收藏。</div>
+        </div>
+        <div class="edition-card">
+            <div class="edition-name">杨继振藏本</div>
+            <div class="edition-desc">因有"兰墅阅过"题字，研究者曾误认为高鹗修改程甲本时之手稿，称"红楼梦稿本"或"梦稿本"。林冠夫以专章辨其非，指出此为误会，应称"杨本"为妥。</div>
+        </div>
+    </div>
+    <p class="edition-footnote">此外尚有郑振铎藏本（仅残存两回）、靖氏藏本（原藏扬州靖应鹍，今下落不明）等。</p>
+</div>
+
+<div class="edition-system">
+    <h3 class="edition-system-title">后期梓印本（程本系统）</h3>
+    <div class="edition-grid">
+        <div class="edition-card">
+            <div class="edition-name">程甲本</div>
+            <div class="edition-desc">乾隆五十六年辛亥（1791）冬，程伟元主持、高鹗参与修订整理，由萃文书屋以木活字首次排印问世。林冠夫称之为"乾隆辛亥萃文书屋木活字摆印本"。自此《红楼梦》由传抄进入梓印阶段。</div>
+        </div>
+        <div class="edition-card">
+            <div class="edition-name">程乙本</div>
+            <div class="edition-desc">乾隆五十七年壬子（1792）春，程高在程甲本基础上作小量改订再次摆印。林冠夫称之为"乾隆壬子萃文书屋木活字摆印本"。此后大量翻刻本均以此为祖本。</div>
+        </div>
+    </div>
+    <p class="edition-footnote">后期梓印本尚有本衙藏板本、东观阁本、抱青阁本、藤花榭本、双清仙馆本（王希廉评）、卧云山馆本（张新之评）、广百宋斋本（三家评）等，多达百七十余种，翻刻辗转，版本状况极为复杂。梓印本亦有以《金玉缘》或《大观琐录》为名者，林冠夫以为前者乃投合时好，后者或为应付禁书令而易名。</p>
+</div>
+
+<div class="edition-system">
+    <h3 class="edition-system-title">现代校注本</h3>
+    <div class="edition-grid">
+        <div class="edition-card edition-downloadable">
+            <div class="edition-name">红楼梦脂评汇校本</div>
+            <div class="edition-desc">以脂评本为底本，汇校各本异同，保留脂砚斋评语，是目前最接近曹雪芹原貌的校注本之一。</div>
+            <div class="edition-dl-link">
+                <a href="/books/原著/红楼梦脂评汇校本.epub" class="dl-btn" download>下载 EPUB · 1.4MB</a>
+            </div>
+        </div>
+        <div class="edition-card edition-downloadable">
+            <div class="edition-name">红楼梦（中国艺术研究院校注本）</div>
+            <div class="edition-desc">以庚辰本为底本，参校各脂本与程刻本，由中国艺术研究院红楼梦研究所校注，是目前最通行的权威读本。</div>
+            <div class="edition-dl-link">
+                <a href="/books/原著/红楼梦 (曹雪芹  无名氏  程伟元  高鹗  中国艺术研究院红楼梦研究所).epub" class="dl-btn" download>下载 EPUB · 3.1MB</a>
+            </div>
+        </div>
+    </div>
+    <div class="edition-more-ref">
+        <p>豆瓣友邻「思适斋中小学生」整理的<a href="https://www.douban.com/doulist/131195606/" target="_blank" rel="noopener">《红楼梦版本概览》</a>，收录 264 种现代版本，涵盖各时期校注本、影印本、排印本。</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}红学文库 · 红楼梦研究{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>红学文库</h1>
+    <p class="page-subtitle">红学研究论著 · 电子书下载</p>
+</div>
+
+<figure class="page-banner">
+    <img src="/static/sunwen/071第23-24回 衆姊妹進住大觀園 西廂記妙詞通戲語.jpg" alt="孙温绘《红楼梦》" loading="lazy">
+    <figcaption class="sunwen-caption">众姊妹进住大观园 西厢记妙词通戏语</figcaption>
+</figure>
+
+<div class="book-grid">
+    {% if categories %}
+    {% for cat in categories %}
+    <div class="book-category">
+        <h3 class="book-category-title">{{ cat.name }}</h3>
+        <div class="book-items">
+            {% for b in cat.books %}
+            <a href="/books/{{ b.path }}" class="book-card" download>
+                <span class="book-icon">{{ '📖' if b.format == 'EPUB' else '📕' }}</span>
+                <span class="book-info">
+                    <span class="book-name">{{ b.book_name }}</span>
+                    {% if b.author %}<span class="book-author{% if b.author|length > 25 %} long-author{% endif %}"> / {{ b.author }}</span>{% endif %}
+                    <span class="book-meta">{{ b.format }} · {{ b.size }}</span>
+                </span>
+                <span class="book-dl-icon">⬇</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p style="color:var(--mo-muted);text-align:center;padding:2rem">暂无书籍</p>
+    {% endif %}
+</div>
+
+<div style="text-align:center;padding:2rem 0;color:var(--mo-muted);font-family:var(--font-cite);font-size:0.9rem;letter-spacing:0.15em">
+    未完待续
+</div>
+{% endblock %}

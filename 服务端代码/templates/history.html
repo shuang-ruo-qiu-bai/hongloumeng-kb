@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}红学历史 · 红楼梦研究{% endblock %}
+
+{% block head %}
+<style>
+.period-narrative-collapsed { display: none; }
+.timeline-toggle {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: var(--jin);
+    cursor: pointer;
+    margin-left: 0.5rem;
+    user-select: none;
+    transition: transform 0.2s;
+    font-family: var(--font-cite);
+}
+.timeline-toggle:hover { color: var(--zhusha); }
+.timeline-period-header {
+    cursor: pointer;
+}
+.timeline-period-header:hover .timeline-period-title {
+    color: var(--zhusha-light);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>红学历史</h1>
+    <p class="page-subtitle">据陈维昭《红学通史》整理 · 三百年红学历程</p>
+</div>
+
+<figure class="page-banner">
+    <img src="/static/sunwen/115第54回 史太君破陳腐舊套 王熙鳳效戲彩斑衣.jpg" alt="孙温绘《红楼梦》" loading="lazy">
+    <figcaption class="sunwen-caption">史太君破陈腐旧套 王熙凤效戏彩斑衣</figcaption>
+</figure>
+
+<div class="timeline">
+    {% for period in periods %}
+    <div class="timeline-period">
+        <div class="timeline-period-header" onclick="toggleNarrative(this)">
+            <span class="timeline-period-title">{{ period.title }}</span>
+            <span class="timeline-period-years">{{ period.years }}</span>
+            <span class="timeline-toggle">[展开]</span>
+            <p class="timeline-period-summary">{{ period.summary }}</p>
+        </div>
+        {% if period.get("narrative") %}
+        <div class="period-narrative period-narrative-collapsed">
+            {% for paragraph in period.narrative.split("\n\n") %}
+            <p>{{ paragraph }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <ul class="timeline-events">
+            {% for year, event in period.events %}
+            <li class="timeline-event">
+                <span class="timeline-event-year">{{ year }}</span>
+                <span class="timeline-event-desc">{{ event }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+function toggleNarrative(header) {
+    var toggle = header.querySelector('.timeline-toggle');
+    var narrative = header.parentElement.querySelector('.period-narrative');
+    if (!narrative) return;
+    var isHidden = narrative.classList.contains('period-narrative-collapsed');
+    if (isHidden) {
+        narrative.classList.remove('period-narrative-collapsed');
+        toggle.textContent = '[收起]';
+    } else {
+        narrative.classList.add('period-narrative-collapsed');
+        toggle.textContent = '[展开]';
+    }
+}
+</script>
+{% endblock %}

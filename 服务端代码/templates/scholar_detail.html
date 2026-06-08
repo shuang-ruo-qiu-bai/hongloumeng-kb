@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ s.name }} · 红学人物 · 红楼梦研究{% endblock %}
+
+{% block content %}
+<div class="scholar-detail">
+    <a href="/scholars" class="page-back-link">← 返回红学人物列表</a>
+
+    <div class="scholar-detail-header">
+        {% if s.get('has_photo') %}
+        <img src="/static/scholars/{{ slug }}.jpg" alt="{{ s.name }}" class="scholar-detail-avatar">
+        {% else %}
+        <div class="scholar-detail-avatar scholar-avatar" style="background:{{ s.avatar_color }};display:inline-flex;width:120px;height:120px;font-size:2.5rem">{{ s.name_short }}</div>
+        {% endif %}
+        <h1 class="page-header" style="padding-top:0;border:none;margin:0">
+            <span style="font-size:1.8rem;letter-spacing:0.3em">{{ s.name }}</span>
+        </h1>
+        <div class="scholar-dates" style="font-size:0.9rem">{{ s.dates }}</div>
+        <span class="scholar-detail-school">{{ s.school }}</span>
+    </div>
+
+    <div class="scholar-detail-bio">
+        {% for paragraph in s.bio_long.split('\n\n') %}
+        <p>{{ paragraph }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="scholar-detail-section">
+        <h3>代表著作</h3>
+        {% for title, desc in s.major_works %}
+        <div class="scholar-detail-work">
+            <div class="scholar-detail-work-title">{{ title }}</div>
+            <div class="scholar-detail-work-desc">{{ desc }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="scholar-detail-section">
+        <h3>学术贡献</h3>
+        <ul>
+            {% for c in s.contributions %}
+            <li>{{ c }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    {% if s.key_positions %}
+    <div class="scholar-detail-section">
+        <h3>职务</h3>
+        <div class="scholar-detail-positions">{{ s.key_positions }}</div>
+    </div>
+    {% endif %}
+
+    {% if s.related_scholars %}
+    <div class="scholar-detail-section">
+        <h3>相关学者</h3>
+        <div class="related-scholars">
+            {% for rel_slug in s.related_scholars %}
+            {% set rel = scholars.get(rel_slug) %}
+            {% if rel %}
+            <a href="/scholars/{{ rel_slug }}" class="related-scholar-link">
+                <span class="related-scholar-avatar" style="background:{{ rel.avatar_color }}">{{ rel.name_short }}</span>
+                {{ rel.name }}
+            </a>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
