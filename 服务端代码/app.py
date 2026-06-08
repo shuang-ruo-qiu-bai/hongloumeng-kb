@@ -79,6 +79,11 @@ def index():
                            query=request.args.get("q", ""),
                            mode=request.args.get("mode", "hybrid"))
 
+@app.route("/promo")
+def promo():
+    """Promotional landing page for WeChat sharing."""
+    return render_template("promo.html")
+
 
 @app.route("/history")
 def history():
